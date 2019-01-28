@@ -10,7 +10,7 @@
     The script requires the presense of the sysinternals handle tool in the same directory. https://docs.microsoft.com/en-us/sysinternals/downloads/handle
 #>
 Param(
-    [Parameter(Mandatory=$true)]$path
+    [Parameter(Mandatory = $true)]$path
 )
 
 $handlesList = "& `".\handle.exe`" $path"
@@ -25,13 +25,10 @@ $handlesList | ForEach-Object {
     }
 }
 
-$pids | ForEach-Object {
-    if (-not $_) {
-        return    
-    }
-
+$pids | % {
+    if (-not $_) { return }
     Get-Process -Id $_ | % {
-        $date = [datetime]::Now
-        "$date : Forcing stop of process Name:$($_.Name) File:$($_.FileName) Path:$($_.Path) `nModules:$($_.Modules)"
+        if (-not $_) { return }
+        Stop-Process $_ -Force -ErrorAction SilentlyContinue
     }
 }
